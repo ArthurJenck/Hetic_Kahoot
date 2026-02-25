@@ -19,7 +19,7 @@ function App() {
 
   // --- Etats de l'application ---
   const [phase, setPhase] = useState<QuizPhase | 'join' | 'feedback'>(
-    'question',
+    'feedback',
   )
   const [playerName, setPlayerName] = useState('')
   const [players, setPlayers] = useState<string[]>([])
@@ -35,15 +35,6 @@ function App() {
     [],
   )
   const [error, setError] = useState<string | undefined>(undefined)
-
-  useEffect(() => {
-    setCurrentQuestion({
-      id: '1',
-      text: 'Ptite question ?',
-      choices: ['A', 'B', 'C', 'D'],
-      timerSec: 30,
-    })
-  }, [])
 
   // --- Traitement des messages du serveur ---
   useEffect(() => {
