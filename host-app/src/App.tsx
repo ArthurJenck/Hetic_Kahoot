@@ -99,7 +99,6 @@ function App() {
       case 'ended': {
         play('leaderboard')
         setPhase('ended')
-        play('leaderboard')
         break
       }
 
