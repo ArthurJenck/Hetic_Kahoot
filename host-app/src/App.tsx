@@ -23,14 +23,19 @@ function App() {
   const [phase, setPhase] = useState<QuizPhase | 'create'>('create')
   const [quizCode, setQuizCode] = useState('')
   const [players, setPlayers] = useState<string[]>([])
-  const [currentQuestion, setCurrentQuestion] = useState<Omit<QuizQuestion, 'correctIndex'> | null>(null)
+  const [currentQuestion, setCurrentQuestion] = useState<Omit<
+    QuizQuestion,
+    'correctIndex'
+  > | null>(null)
   const [questionIndex, setQuestionIndex] = useState(0)
   const [questionTotal, setQuestionTotal] = useState(0)
   const [remaining, setRemaining] = useState(0)
   const [answerCount, setAnswerCount] = useState(0)
   const [correctIndex, setCorrectIndex] = useState(-1)
   const [distribution, setDistribution] = useState<number[]>([])
-  const [rankings, setRankings] = useState<{ name: string; score: number }[]>([])
+  const [rankings, setRankings] = useState<{ name: string; score: number }[]>(
+    [],
+  )
 
   // --- Traitement des messages du serveur ---
   useEffect(() => {
@@ -41,57 +46,64 @@ function App() {
 
     switch (lastMessage.type) {
       case 'sync': {
-        // TODO: Quand le serveur envoie un sync (apres host:create),
-        // extraire le quizCode de lastMessage.data et mettre a jour l'etat
-        // Changer la phase vers lastMessage.phase
+        const data = lastMessage.data as { quizCode: string }
+        setQuizCode(data.quizCode)
+        setPhase(lastMessage.phase)
         if (lastMessage.phase === 'lobby') play('lobby')
         break
       }
 
       case 'joined': {
-        // TODO: Mettre a jour la liste des joueurs avec lastMessage.players
+        setPlayers(lastMessage.players)
         break
       }
 
       case 'question': {
-        // TODO: Mettre a jour currentQuestion, questionIndex, questionTotal
-        // TODO: Initialiser remaining avec la duree du timer de la question
-        // TODO: Reinitialiser answerCount a 0
-        // TODO: Changer la phase en 'question'
         stopAll()
         play('getReady')
         playCountdown(lastMessage.question.timerSec)
+        setCurrentQuestion(lastMessage.question)
+        setQuestionIndex(lastMessage.index)
+        setQuestionTotal(lastMessage.total)
+        setRemaining(lastMessage.question.timerSec)
+        setAnswerCount(0)
+        setPhase('question')
         break
       }
 
       case 'tick': {
-        // TODO: Mettre a jour remaining avec lastMessage.remaining
+        setRemaining(lastMessage.remaining)
         break
       }
 
       case 'results': {
-        // TODO: Mettre a jour correctIndex, distribution
-        // TODO: Calculer answerCount (somme de distribution)
-        // TODO: Changer la phase en 'results'
         stopAll()
+        setCorrectIndex(lastMessage.correctIndex)
+        setDistribution(lastMessage.distribution)
+        let total = 0
+        for (const count of lastMessage.distribution) {
+          total = total + count
+        }
+        setAnswerCount(total)
+        setPhase('results')
         break
       }
 
       case 'leaderboard': {
-        // TODO: Mettre a jour rankings avec lastMessage.rankings
-        // TODO: Changer la phase en 'leaderboard'
         play('leaderboard')
+        setRankings(lastMessage.rankings)
+        setPhase('leaderboard')
         break
       }
 
       case 'ended': {
-        // TODO: Changer la phase en 'ended'
         play('leaderboard')
+        setPhase('ended')
         break
       }
 
       case 'error': {
-        // TODO: Afficher l'erreur (console.error ou alert)
+        console.error(lastMessage.message)
         break
       }
     }
@@ -101,17 +113,17 @@ function App() {
 
   /** Appele quand le host soumet le formulaire de creation */
   const handleCreateQuiz = (title: string, questions: QuizQuestion[]) => {
-    // TODO: Envoyer un message 'host:create' au serveur avec sendMessage
+    sendMessage({ type: 'host:create', title, questions })
   }
 
   /** Appele quand le host clique sur "Demarrer" dans le lobby */
   const handleStart = () => {
-    // TODO: Envoyer un message 'host:start' au serveur
+    sendMessage({ type: 'host:start' })
   }
 
   /** Appele quand le host clique sur "Question suivante" */
   const handleNext = () => {
-    // TODO: Envoyer un message 'host:next' au serveur
+    sendMessage({ type: 'host:next' })
   }
 
   // --- Rendu par phase ---
@@ -122,11 +134,7 @@ function App() {
 
       case 'lobby':
         return (
-          <Lobby
-            quizCode={quizCode}
-            players={players}
-            onStart={handleStart}
-          />
+          <Lobby quizCode={quizCode} players={players} onStart={handleStart} />
         )
 
       case 'question':
@@ -174,12 +182,14 @@ function App() {
       <header className="app-header">
         <h2>Quiz Host</h2>
         <span className={`status-badge status-${status}`}>
-          {status === 'connected' ? 'Connecte' : status === 'connecting' ? 'Connexion...' : 'Deconnecte'}
+          {status === 'connected'
+            ? 'Connecte'
+            : status === 'connecting'
+              ? 'Connexion...'
+              : 'Deconnecte'}
         </span>
       </header>
-      <main className="app-main">
-        {renderPhase()}
-      </main>
+      <main className="app-main">{renderPhase()}</main>
     </div>
   )
 }
