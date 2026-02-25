@@ -18,7 +18,9 @@ function App() {
   const { status, sendMessage, lastMessage } = useWebSocket(WS_URL)
 
   // --- Etats de l'application ---
-  const [phase, setPhase] = useState<QuizPhase | 'join' | 'feedback'>('lobby')
+  const [phase, setPhase] = useState<QuizPhase | 'join' | 'feedback'>(
+    'question',
+  )
   const [playerName, setPlayerName] = useState('')
   const [players, setPlayers] = useState<string[]>([])
   const [currentQuestion, setCurrentQuestion] = useState<Omit<
@@ -33,6 +35,15 @@ function App() {
     [],
   )
   const [error, setError] = useState<string | undefined>(undefined)
+
+  useEffect(() => {
+    setCurrentQuestion({
+      id: '1',
+      text: 'Ptite question ?',
+      choices: ['A', 'B', 'C', 'D'],
+      timerSec: 30,
+    })
+  }, [])
 
   // --- Traitement des messages du serveur ---
   useEffect(() => {
@@ -99,9 +110,10 @@ function App() {
 
   /** Appele quand le joueur clique sur un choix de reponse */
   const handleAnswer = (choiceIndex: number) => {
-    // TODO: Verifier que le joueur n'a pas deja repondu (hasAnswered)
-    // TODO: Marquer hasAnswered a true
-    // TODO: Envoyer un message 'answer' au serveur avec l'id de la question et le choiceIndex
+    if (hasAnswered || !currentQuestion) return
+
+    setHasAnswered(true)
+    sendMessage({ type: 'answer', questionId: currentQuestion.id, choiceIndex })
   }
 
   // --- Rendu par phase ---
@@ -117,7 +129,7 @@ function App() {
         return currentQuestion ? (
           <AnswerScreen
             question={currentQuestion}
-            remaining={remaining}
+            remaining={10}
             onAnswer={handleAnswer}
             hasAnswered={hasAnswered}
           />
@@ -136,8 +148,8 @@ function App() {
       case 'ended':
         return (
           <div className="phase-container">
-            <h1>Quiz termine !</h1>
-            <p className="ended-message">Merci d'avoir participe !</p>
+            <h1>Quiz terminé !</h1>
+            <p className="ended-message">Merci d'avoir participé !</p>
             <button className="btn-primary" onClick={() => setPhase('join')}>
               Rejoindre un autre quiz
             </button>

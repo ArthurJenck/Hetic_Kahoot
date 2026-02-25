@@ -254,12 +254,37 @@ body {
   margin-bottom: 1rem;
 }
 
+.answer-timer-bar {
+  width: 100%;
+  height: 10px;
+  background: #334155;
+  border-radius: 999px;
+  overflow: hidden;
+  margin-bottom: 0.5rem;
+}
+
+.answer-timer-fill {
+  height: 100%;
+  background: #f1f5f9;
+  border-radius: 999px;
+  transform-origin: right;
+  transition: transform 1s linear;
+}
+
 .answer-timer.warning {
   color: #f59e0b;
 }
 
+.answer-timer-fill.warning {
+  background: #f59e0b;
+}
+
 .answer-timer.danger {
   color: #ef4444;
+}
+
+.answer-timer-fill.danger {
+  background: #ef4444;
   animation: pulse 0.5s infinite;
 }
 

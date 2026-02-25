@@ -37,6 +37,9 @@ importers:
 
   player-app:
     dependencies:
+      '@sglara/cn':
+        specifier: ^1.0.0
+        version: 1.0.0
       react:
         specifier: ^18.2.0
         version: 18.3.1
@@ -466,6 +469,9 @@ packages:
     cpu: [x64]
     os: [win32]
 
+  '@sglara/cn@1.0.0':
+    resolution: {integrity: sha512-uo5RMzXVhS2XdsPYajVH349/eBxhLEoJOmScUuX0V5kesB8DueofOh64kgVR4v3/uZWJBpMYy5Eh9aIG+qG34Q==}
+
   '@tsconfig/node10@1.0.12':
     resolution: {integrity: sha512-UCYBaeFvM11aU2y3YPZ//O5Rhj+xKyzy7mvcIoAjASbigy8mHMryP5cK7dgjlz2hWxh1g5pLw084E0a/wlUSFQ==}
 
@@ -540,6 +546,10 @@ packages:
 
   caniuse-lite@1.0.30001774:
     resolution: {integrity: sha512-DDdwPGz99nmIEv216hKSgLD+D4ikHQHjBC/seF98N9CPqRX4M5mSxT9eTV6oyisnJcuzxtZy4n17yKKQYmYQOA==}
+
+  clsx@1.2.1:
+    resolution: {integrity: sha512-EcR6r5a8bj6pu3ycsa/E/cKVGuTgZJZdsyUYHOksG/UHIiKfjxzRxYJpyVBwYaQeOvghal9fcc4PidlgzugAQg==}
+    engines: {node: '>=6'}
 
   convert-source-map@2.0.0:
     resolution: {integrity: sha512-Kvp459HrV2FEJ1CAsi1Ku+MY3kasH19TFykTz2xWmMeq6bk2NU3XXvfJ+Q61m0xktWwt+1HSYf3JZsTms3aRJg==}
@@ -653,6 +663,9 @@ packages:
   source-map-js@1.2.1:
     resolution: {integrity: sha512-UXWMKhLOwVKb728IUtQPXxfYU+usdybtUrK/8uGE8CQMvrhOpwvzDBwj0QhSL7MQc7vIsISBG8VQ8+IDQxpfQA==}
     engines: {node: '>=0.10.0'}
+
+  tailwind-merge@1.14.0:
+    resolution: {integrity: sha512-3mFKyCo/MBcgyOTlrY8T7odzZFx+w+qKSMAmdFzRvqBfLlSigU6TZnlFHK0lkMwj9Bj8OYU+9yW9lmGuS0QEnQ==}
 
   ts-node@10.9.2:
     resolution: {integrity: sha512-f0FFpIdcHgn8zcPSbf1dRevwt047YMnaiJM3u2w2RewrB+fob/zePZcrOyQoLMMO7aBIddLcQIEK5dYjkLnGrQ==}
@@ -1023,6 +1036,11 @@ snapshots:
   '@rollup/rollup-win32-x64-msvc@4.59.0':
     optional: true
 
+  '@sglara/cn@1.0.0':
+    dependencies:
+      clsx: 1.2.1
+      tailwind-merge: 1.14.0
+
   '@tsconfig/node10@1.0.12': {}
 
   '@tsconfig/node12@1.0.11': {}
@@ -1104,6 +1122,8 @@ snapshots:
       update-browserslist-db: 1.2.3(browserslist@4.28.1)
 
   caniuse-lite@1.0.30001774: {}
+
+  clsx@1.2.1: {}
 
   convert-source-map@2.0.0: {}
 
@@ -1232,6 +1252,8 @@ snapshots:
   semver@6.3.1: {}
 
   source-map-js@1.2.1: {}
+
+  tailwind-merge@1.14.0: {}
 
   ts-node@10.9.2(@types/node@20.19.33)(typescript@5.9.3):
     dependencies:
