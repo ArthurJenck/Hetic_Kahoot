@@ -12,12 +12,14 @@ import Lobby from './components/Lobby'
 import QuestionView from './components/QuestionView'
 import Results from './components/Results'
 import Leaderboard from './components/Leaderboard'
+import useQuizStore from './stores/quizStore'
 
 const WS_URL = `ws://${window.location.hostname}:3001`
 
 function App() {
   const { status, sendMessage, lastMessage } = useWebSocket(WS_URL)
   const { play, stop, stopAll, playCountdown } = useHostSounds()
+  const { sessionId, setSessionId } = useQuizStore()
 
   // --- Etats de l'application ---
   const [phase, setPhase] = useState<QuizPhase | 'create'>('create')
@@ -48,8 +50,9 @@ function App() {
       case 'sync': {
         if (lastMessage.phase === 'lobby') play('lobby')
 
-        const data = lastMessage.data as { quizCode: string }
-        setQuizCode(data.quizCode)
+        const data = lastMessage.data as { quizCode?: string; sessionId?: string }
+        if (data.quizCode) setQuizCode(data.quizCode)
+        if (data.sessionId) setSessionId(data.sessionId)
         setPhase(lastMessage.phase)
         break
       }
@@ -104,6 +107,7 @@ function App() {
         play('leaderboard')
 
         setPhase('ended')
+        setSessionId('')
         break
       }
 
@@ -113,6 +117,14 @@ function App() {
       }
     }
   }, [lastMessage])
+
+  // --- Reconnexion automatique si on avait une session ---
+  useEffect(() => {
+    if (status === 'connected' && sessionId) {
+      console.log('[Host] Reconnexion avec sessionId:', sessionId)
+      sendMessage({ type: 'reconnect', sessionId })
+    }
+  }, [status])
 
   // --- Handlers ---
 

@@ -23,6 +23,7 @@ export type ClientMessage =
   | { type: 'host:start' }
   | { type: 'host:next' }
   | { type: 'host:end' }
+  | { type: 'reconnect'; sessionId: string }
 
 /** Messages envoyes par le serveur vers les clients */
 export type ServerMessage =

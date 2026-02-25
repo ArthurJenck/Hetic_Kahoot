@@ -12,12 +12,14 @@ import WaitingLobby from './components/WaitingLobby'
 import AnswerScreen from './components/AnswerScreen'
 import FeedbackScreen from './components/FeedbackScreen'
 import ScoreScreen from './components/ScoreScreen'
+import useQuizStore from './stores/quizStore'
 
 const WS_URL = `${window.location.protocol === 'https:' ? 'wss:' : 'ws:'}//${window.location.host}/ws`
 
 function App() {
   const { status, sendMessage, lastMessage } = useWebSocket(WS_URL)
   const { play, stopAll, playCountdown } = usePlayerSounds()
+  const { sessionId, setSessionId } = useQuizStore()
 
   // --- Etats de l'application ---
   const [phase, setPhase] = useState<QuizPhase | 'join' | 'feedback'>('join')
@@ -87,6 +89,7 @@ function App() {
 
       case 'ended': {
         setPhase('ended')
+        setSessionId('')
         break
       }
 
@@ -94,8 +97,23 @@ function App() {
         setError(lastMessage.message)
         break
       }
+
+      case 'sync': {
+        const data = lastMessage.data as { sessionId?: string }
+        if (data.sessionId) setSessionId(data.sessionId)
+        setPhase(lastMessage.phase)
+        break
+      }
     }
   }, [lastMessage])
+
+  // --- Reconnexion automatique si on avait une session ---
+  useEffect(() => {
+    if (status === 'connected' && sessionId) {
+      console.log('[Player] Reconnexion avec sessionId:', sessionId)
+      sendMessage({ type: 'reconnect', sessionId })
+    }
+  }, [status])
 
   // --- Handlers ---
 
