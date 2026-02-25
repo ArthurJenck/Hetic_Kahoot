@@ -3,6 +3,7 @@
 // ============================================================
 
 import WebSocket from 'ws'
+import { randomUUID } from 'crypto'
 import type { ServerMessage } from '../../packages/shared-types'
 
 /**
@@ -35,3 +36,12 @@ export function broadcast(clients: Iterable<WebSocket>, message: ServerMessage):
 export function generateQuizCode(): string {
   return Math.random().toString(36).substring(2, 8).toUpperCase()
 }
+
+/**
+ * Genere un id de user aleatoire de 16 caracteres alphanumeriques majuscules.
+ * Exemple : "12A8VQI83S7CH4V6"
+ */
+export function generateID(): string {
+    return randomUUID().slice(0, 16).toUpperCase();
+}
+
