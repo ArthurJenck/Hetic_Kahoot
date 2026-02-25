@@ -28,6 +28,9 @@ function App() {
     'correctIndex'
   > | null>(null)
   const [remaining, setRemaining] = useState(0)
+  const [lastAnswerId, setLastAnswerId] = useState<number | undefined>(
+    undefined,
+  )
   const [hasAnswered, setHasAnswered] = useState(false)
   const [lastCorrect, setLastCorrect] = useState(false)
   const [score, setScore] = useState(0)
@@ -40,52 +43,47 @@ function App() {
   useEffect(() => {
     if (!lastMessage) return
 
-    // TODO: Traiter chaque type de message du serveur
-    // Utiliser un switch sur lastMessage.type
-
     switch (lastMessage.type) {
       case 'joined': {
-        // TODO: Mettre a jour la liste des joueurs
-        // TODO: Passer en phase 'lobby'
-        // TODO: Effacer les erreurs
+        setPlayers(lastMessage.players)
+        setPhase('lobby')
+        setError(undefined)
         break
       }
 
       case 'question': {
-        // TODO: Mettre a jour currentQuestion avec lastMessage.question
-        // TODO: Mettre a jour remaining avec lastMessage.question.timerSec
-        // TODO: Reinitialiser hasAnswered a false
-        // TODO: Changer la phase en 'question'
+        setCurrentQuestion(lastMessage.question)
+        setRemaining(lastMessage.question.timerSec)
+        setHasAnswered(false)
+        setPhase('question')
         break
       }
 
       case 'tick': {
-        // TODO: Mettre a jour remaining avec lastMessage.remaining
+        setRemaining(lastMessage.remaining)
         break
       }
 
       case 'results': {
-        // TODO: Verifier si le joueur a repondu correctement
-        //   (comparer la reponse du joueur avec lastMessage.correctIndex)
-        // TODO: Mettre a jour lastCorrect (true/false)
-        // TODO: Recuperer le score du joueur depuis lastMessage.scores
-        // TODO: Changer la phase en 'feedback'
+        setLastCorrect(lastAnswerId === lastMessage.correctIndex)
+        setScore(lastMessage.scores[playerName])
+        setPhase('feedback')
         break
       }
 
       case 'leaderboard': {
-        // TODO: Mettre a jour rankings avec lastMessage.rankings
-        // TODO: Changer la phase en 'leaderboard'
+        setRankings(lastMessage.rankings)
+        setPhase('leaderboard')
         break
       }
 
       case 'ended': {
-        // TODO: Changer la phase en 'ended'
+        setPhase('ended')
         break
       }
 
       case 'error': {
-        // TODO: Stocker le message d'erreur dans le state error
+        setError(lastMessage.message)
         break
       }
     }
@@ -103,6 +101,7 @@ function App() {
   const handleAnswer = (choiceIndex: number) => {
     if (hasAnswered || !currentQuestion) return
 
+    setLastAnswerId(choiceIndex)
     setHasAnswered(true)
     sendMessage({ type: 'answer', questionId: currentQuestion.id, choiceIndex })
   }
@@ -120,7 +119,7 @@ function App() {
         return currentQuestion ? (
           <AnswerScreen
             question={currentQuestion}
-            remaining={10}
+            remaining={remaining}
             onAnswer={handleAnswer}
             hasAnswered={hasAnswered}
           />
