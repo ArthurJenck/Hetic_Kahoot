@@ -22,7 +22,7 @@ interface WaitingLobbyProps {
 function WaitingLobby({ players }: WaitingLobbyProps) {
   return (
     <div className="phase-container waiting-container">
-      <p className="waiting-message">En attende de l'hôte...</p>
+      <p className="waiting-message">En attente de l'hôte...</p>
       <p>Joueurs connectés : {players.length}</p>
       <ul className="player-list">
         {players.map((player, i) => (

@@ -3,7 +3,7 @@
 // A IMPLEMENTER : champs code et nom, bouton rejoindre
 // ============================================================
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 interface JoinScreenProps {
   /** Callback appele quand le joueur soumet le formulaire */
@@ -32,6 +32,10 @@ function JoinScreen({ onJoin, error }: JoinScreenProps) {
   const [errorToDisplay, setErrorToDisplay] = useState<string | undefined>(
     error,
   )
+
+  useEffect(() => {
+    setErrorToDisplay(error)
+  }, [error])
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()

@@ -32,7 +32,7 @@ function ScoreScreen({ rankings, playerName }: ScoreScreenProps) {
   return (
     <div className="phase-container score-screen">
       <h2 className="leaderboard-title">Classement</h2>
-      <div className="leaderboard">
+      <ul className="leaderboard">
         {rankings.map((ranking, i) => (
           <li
             key={ranking.name}
@@ -46,7 +46,7 @@ function ScoreScreen({ rankings, playerName }: ScoreScreenProps) {
             <span className="leaderboard-score">{ranking.score}</span>
           </li>
         ))}
-      </div>
+      </ul>
     </div>
   )
 }

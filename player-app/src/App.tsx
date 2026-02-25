@@ -18,9 +18,7 @@ function App() {
   const { status, sendMessage, lastMessage } = useWebSocket(WS_URL)
 
   // --- Etats de l'application ---
-  const [phase, setPhase] = useState<QuizPhase | 'join' | 'feedback'>(
-    'leaderboard',
-  )
+  const [phase, setPhase] = useState<QuizPhase | 'join' | 'feedback'>('join')
   const [playerName, setPlayerName] = useState('')
   const [players, setPlayers] = useState<string[]>([])
   const [currentQuestion, setCurrentQuestion] = useState<Omit<
