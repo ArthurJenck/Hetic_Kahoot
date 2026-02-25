@@ -51,12 +51,15 @@ function JoinScreen({ onJoin, error }: JoinScreenProps) {
   return (
     <form className="join-form form-group" onSubmit={handleSubmit}>
       <h1>Rejoindre un Quiz</h1>
+
       {errorToDisplay && <p className="error-message">{errorToDisplay}</p>}
+
       <input
         className="code-input"
         type="text"
         name="quizCode"
         id="quizCode"
+        placeholder="Salon"
         minLength={6}
         maxLength={6}
         onChange={(e) => setQuizCode(e.target.value.toLocaleUpperCase())}
@@ -65,6 +68,7 @@ function JoinScreen({ onJoin, error }: JoinScreenProps) {
         type="text"
         name="nick"
         id="nick"
+        placeholder="Pseudo"
         maxLength={16}
         onChange={(e) => setNick(e.target.value)}
       />

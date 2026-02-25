@@ -13,7 +13,7 @@ import QuestionView from './components/QuestionView'
 import Results from './components/Results'
 import Leaderboard from './components/Leaderboard'
 
-const WS_URL = 'ws://localhost:3001'
+const WS_URL = `ws://${window.location.hostname}:3001`
 
 function App() {
   const { status, sendMessage, lastMessage } = useWebSocket(WS_URL)
@@ -68,9 +68,6 @@ function App() {
         setRemaining(lastMessage.question.timerSec)
         setAnswerCount(0)
         setPhase('question')
-        stopAll()
-        play('getReady')
-        playCountdown(lastMessage.question.timerSec)
         break
       }
 
@@ -80,7 +77,6 @@ function App() {
       }
 
       case 'results': {
-        stopAll()
         setCorrectIndex(lastMessage.correctIndex)
         setDistribution(lastMessage.distribution)
         let total = 0
@@ -89,7 +85,6 @@ function App() {
         }
         setAnswerCount(total)
         setPhase('results')
-        stopAll()
         break
       }
 
@@ -97,14 +92,12 @@ function App() {
         play('leaderboard')
         setRankings(lastMessage.rankings)
         setPhase('leaderboard')
-        play('leaderboard')
         break
       }
 
       case 'ended': {
         play('leaderboard')
         setPhase('ended')
-        play('leaderboard')
         break
       }
 

@@ -13,7 +13,7 @@ import AnswerScreen from './components/AnswerScreen'
 import FeedbackScreen from './components/FeedbackScreen'
 import ScoreScreen from './components/ScoreScreen'
 
-const WS_URL = 'ws://localhost:3001'
+const WS_URL = `${window.location.protocol === 'https:' ? 'wss:' : 'ws:'}//${window.location.host}/ws`
 
 function App() {
   const { status, sendMessage, lastMessage } = useWebSocket(WS_URL)
@@ -70,7 +70,6 @@ function App() {
       }
 
       case 'results': {
-        stopAll()
         setLastCorrect(lastAnswerId === lastMessage.correctIndex)
         setScore(lastMessage.scores[playerName])
         setPhase('feedback')

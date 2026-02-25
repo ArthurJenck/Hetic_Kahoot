@@ -10,4 +10,13 @@ export default defineConfig({
       '@sounds': path.resolve(__dirname, '../packages/shared-sounds'),
     },
   },
+  server: {
+    allowedHosts: true,
+    proxy: {
+      '/ws': {
+        target: 'ws://localhost:3001',
+        ws: true,
+      },
+    },
+  },
 })
