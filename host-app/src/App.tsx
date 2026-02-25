@@ -68,6 +68,9 @@ function App() {
         setRemaining(lastMessage.question.timerSec)
         setAnswerCount(0)
         setPhase('question')
+        stopAll()
+        play('getReady')
+        playCountdown(lastMessage.question.timerSec)
         break
       }
 
@@ -86,6 +89,7 @@ function App() {
         }
         setAnswerCount(total)
         setPhase('results')
+        stopAll()
         break
       }
 
@@ -93,12 +97,14 @@ function App() {
         play('leaderboard')
         setRankings(lastMessage.rankings)
         setPhase('leaderboard')
+        play('leaderboard')
         break
       }
 
       case 'ended': {
         play('leaderboard')
         setPhase('ended')
+        play('leaderboard')
         break
       }
 
