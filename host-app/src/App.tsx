@@ -46,10 +46,11 @@ function App() {
 
     switch (lastMessage.type) {
       case 'sync': {
+        if (lastMessage.phase === 'lobby') play('lobby')
+
         const data = lastMessage.data as { quizCode: string }
         setQuizCode(data.quizCode)
         setPhase(lastMessage.phase)
-        if (lastMessage.phase === 'lobby') play('lobby')
         break
       }
 
@@ -62,6 +63,7 @@ function App() {
         stopAll()
         play('getReady')
         playCountdown(lastMessage.question.timerSec)
+
         setCurrentQuestion(lastMessage.question)
         setQuestionIndex(lastMessage.index)
         setQuestionTotal(lastMessage.total)
@@ -78,6 +80,7 @@ function App() {
 
       case 'results': {
         stopAll()
+
         setCorrectIndex(lastMessage.correctIndex)
         setDistribution(lastMessage.distribution)
         let total = 0
@@ -91,6 +94,7 @@ function App() {
 
       case 'leaderboard': {
         play('leaderboard')
+
         setRankings(lastMessage.rankings)
         setPhase('leaderboard')
         break
@@ -98,6 +102,7 @@ function App() {
 
       case 'ended': {
         play('leaderboard')
+
         setPhase('ended')
         break
       }
