@@ -17,7 +17,8 @@
     "noFallthroughCasesInSwitch": true,
     "baseUrl": ".",
     "paths": {
-      "@shared/*": ["../packages/shared-types/*"]
+      "@shared/*": ["../packages/shared-types/*"],
+      "@sounds/*": ["../packages/shared-sounds/*"]
     }
   },
   "include": ["src"],

@@ -12,9 +12,9 @@ interface WaitingLobbyProps {
  * Composant ecran d'attente affiche cote joueur apres avoir rejoint.
  *
  * Ce qu'il faut implementer :
- * - Un message "En attente du host..." (classe .waiting-message)
- * - Le nombre de joueurs connectes
- * - La liste des joueurs (puces avec classe .player-chip dans un .player-list)
+ * - Un message "En attente du host..." (classe .waiting-message) V
+ * - Le nombre de joueurs connectes V
+ * - La liste des joueurs (puces avec classe .player-chip dans un .player-list) V
  *
  * Classes CSS disponibles : .waiting-container, .waiting-message,
  * .player-list, .player-chip
@@ -22,9 +22,15 @@ interface WaitingLobbyProps {
 function WaitingLobby({ players }: WaitingLobbyProps) {
   return (
     <div className="phase-container waiting-container">
-      {/* TODO: Message "En attente du host..." avec .waiting-message */}
-      {/* TODO: Nombre de joueurs */}
-      {/* TODO: Liste des joueurs avec .player-list et .player-chip */}
+      <p className="waiting-message">En attente de l'hôte...</p>
+      <p>Joueurs connectés : {players.length}</p>
+      <ul className="player-list">
+        {players.map((player, i) => (
+          <li key={`player-${i}`} className="player-chip">
+            {player}
+          </li>
+        ))}
+      </ul>
     </div>
   )
 }
