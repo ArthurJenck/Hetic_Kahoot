@@ -5,6 +5,7 @@
 
 import { useState, useEffect } from 'react'
 import { useWebSocket } from './hooks/useWebSocket'
+import { useHostSounds } from './hooks/useHostSounds'
 import type { QuizPhase, QuizQuestion, ServerMessage } from '@shared/index'
 import CreateQuiz from './components/CreateQuiz'
 import Lobby from './components/Lobby'
@@ -16,6 +17,7 @@ const WS_URL = 'ws://localhost:3001'
 
 function App() {
   const { status, sendMessage, lastMessage } = useWebSocket(WS_URL)
+  const { play, stop, stopAll, playCountdown } = useHostSounds()
 
   // --- Etats de l'application ---
   const [phase, setPhase] = useState<QuizPhase | 'create'>('create')
@@ -42,6 +44,7 @@ function App() {
         // TODO: Quand le serveur envoie un sync (apres host:create),
         // extraire le quizCode de lastMessage.data et mettre a jour l'etat
         // Changer la phase vers lastMessage.phase
+        if (lastMessage.phase === 'lobby') play('lobby')
         break
       }
 
@@ -55,6 +58,9 @@ function App() {
         // TODO: Initialiser remaining avec la duree du timer de la question
         // TODO: Reinitialiser answerCount a 0
         // TODO: Changer la phase en 'question'
+        stopAll()
+        play('getReady')
+        playCountdown(lastMessage.question.timerSec)
         break
       }
 
@@ -67,17 +73,20 @@ function App() {
         // TODO: Mettre a jour correctIndex, distribution
         // TODO: Calculer answerCount (somme de distribution)
         // TODO: Changer la phase en 'results'
+        stopAll()
         break
       }
 
       case 'leaderboard': {
         // TODO: Mettre a jour rankings avec lastMessage.rankings
         // TODO: Changer la phase en 'leaderboard'
+        play('leaderboard')
         break
       }
 
       case 'ended': {
         // TODO: Changer la phase en 'ended'
+        play('leaderboard')
         break
       }
 

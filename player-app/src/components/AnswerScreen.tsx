@@ -5,6 +5,7 @@
 
 import { useState } from 'react'
 import type { QuizQuestion } from '@shared/index'
+import { usePlayerSounds } from '../hooks/usePlayerSounds'
 import { cn } from '@sglara/cn'
 
 interface AnswerScreenProps {
@@ -41,10 +42,12 @@ function AnswerScreen({
   hasAnswered,
 }: AnswerScreenProps) {
   const [selectedId, setSelectedId] = useState<number | undefined>(undefined)
+  const { play } = usePlayerSounds()
 
   const handleClick = (index: number) => {
     if (hasAnswered) return
 
+    play('answerSent')
     onAnswer(index)
     setSelectedId(index)
   }

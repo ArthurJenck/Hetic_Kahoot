@@ -5,6 +5,7 @@
 
 import { useState, useEffect } from 'react'
 import { useWebSocket } from './hooks/useWebSocket'
+import { usePlayerSounds } from './hooks/usePlayerSounds'
 import type { QuizPhase, QuizQuestion } from '@shared/index'
 import JoinScreen from './components/JoinScreen'
 import WaitingLobby from './components/WaitingLobby'
@@ -16,6 +17,7 @@ const WS_URL = 'ws://localhost:3001'
 
 function App() {
   const { status, sendMessage, lastMessage } = useWebSocket(WS_URL)
+  const { play, stopAll, playCountdown } = usePlayerSounds()
 
   // --- Etats de l'application ---
   const [phase, setPhase] = useState<QuizPhase | 'join' | 'feedback'>('join')
@@ -43,6 +45,8 @@ function App() {
 
     switch (lastMessage.type) {
       case 'joined': {
+        stopAll()
+        play('lobby')
         setPlayers(lastMessage.players)
         setPhase('lobby')
         setError(undefined)
@@ -50,6 +54,9 @@ function App() {
       }
 
       case 'question': {
+        stopAll()
+        play('getReady')
+        playCountdown(lastMessage.question.timerSec)
         setCurrentQuestion(lastMessage.question)
         setRemaining(lastMessage.question.timerSec)
         setHasAnswered(false)
@@ -63,6 +70,7 @@ function App() {
       }
 
       case 'results': {
+        stopAll()
         setLastCorrect(lastAnswerId === lastMessage.correctIndex)
         setScore(lastMessage.scores[playerName])
         setPhase('feedback')
@@ -70,6 +78,8 @@ function App() {
       }
 
       case 'leaderboard': {
+        stopAll()
+        play('leaderboard')
         setRankings(lastMessage.rankings)
         setPhase('leaderboard')
         break

@@ -3,7 +3,9 @@
 // A IMPLEMENTER : icone et score
 // ============================================================
 
+import { useEffect } from 'react'
 import { cn } from '@sglara/cn'
+import { usePlayerSounds } from '../hooks/usePlayerSounds'
 
 interface FeedbackScreenProps {
   /** Si true, le joueur a repondu correctement */
@@ -26,6 +28,12 @@ interface FeedbackScreenProps {
  * .feedback-icon, .feedback-text, .feedback-score
  */
 function FeedbackScreen({ correct, score }: FeedbackScreenProps) {
+  const { play } = usePlayerSounds()
+
+  useEffect(() => {
+    play(correct ? 'correct' : 'incorrect')
+  }, [correct, play])
+
   return (
     <div className="phase-container feedback-container">
       <div className={cn('feedback', correct ? 'correct' : 'incorrect')}>
