@@ -70,6 +70,7 @@ function App() {
       }
 
       case 'results': {
+        stopAll()
         setLastCorrect(lastAnswerId === lastMessage.correctIndex)
         setScore(lastMessage.scores[playerName])
         setPhase('feedback')

@@ -77,6 +77,7 @@ function App() {
       }
 
       case 'results': {
+        stopAll()
         setCorrectIndex(lastMessage.correctIndex)
         setDistribution(lastMessage.distribution)
         let total = 0
@@ -98,6 +99,7 @@ function App() {
       case 'ended': {
         play('leaderboard')
         setPhase('ended')
+        play('leaderboard')
         break
       }
 
