@@ -3,16 +3,18 @@
 // A IMPLEMENTER : remplir le corps de chaque methode
 // ============================================================
 
-import WebSocket, { CLOSED } from 'ws'
+import WebSocket from 'ws'
 import type { QuizQuestion, QuizPhase, ServerMessage } from '../../packages/shared-types'
 import { send, broadcast, generateID } from './utils'
-import { ClientRequest } from 'http'
 
-/** Represente un joueur connecte */
+/** Represente un joueur (connecte ou temporairement deconnecte) */
 interface Player {
   id: string
   name: string
-  ws: WebSocket
+  ws: WebSocket | null
+  sessionToken: string
+  disconnected: boolean
+  graceTimer: ReturnType<typeof setTimeout> | null
 }
 
 export class QuizRoom {
@@ -27,6 +29,9 @@ export class QuizRoom {
 
   /** WebSocket du host (presentateur) */
   hostWs: WebSocket | null = null
+
+  /** Token de session du host pour la reconnexion */
+  hostSessionToken: string = ''
 
   /** Map des joueurs : playerId -> Player */
   players: Map<string, Player> = new Map()
@@ -52,6 +57,12 @@ export class QuizRoom {
   /** Temps restant pour la question en cours */
   remaining: number = 0
 
+  /** Indique si le quiz est en pause (host deconnecte pendant une question) */
+  paused: boolean = false
+
+  /** Derniers resultats envoyes, pour les rejouer a un joueur qui se reconnecte */
+  lastResults: { correctIndex: number; distribution: number[]; scores: Record<string, number> } | null = null
+
   constructor(id: string, code: string) {
     this.id = id
     this.code = code
@@ -66,23 +77,79 @@ export class QuizRoom {
    *   avec la liste des noms de joueurs
    * @returns l'ID du joueur cree
    */
-  addPlayer(name: string, ws: WebSocket): string {
-    // Generer un ID unique (ex: crypto.randomUUID() ou Math.random())
+  addPlayer(name: string, ws: WebSocket): { id: string; sessionToken: string } {
     const id = generateID();
-    // Creer le Player et l'ajouter a this.players
+    const sessionToken = generateID();
     const newPlayer: Player = {
-      id: id,
-      name: name,
-      ws: ws
+      id,
+      name,
+      ws,
+      sessionToken,
+      disconnected: false,
+      graceTimer: null,
     };
 
     this.players.set(id, newPlayer);
-    // Initialiser le score a 0
-    this.scores.set(id, 0); 
-    // Envoyer 'joined' a tous les clients
-    this.broadcastToAll({type: 'joined', playerId: id, players: Array.from(this.players.values()).map(p => p.name)});
-    // Retourner l'ID du joueur
-    return id;
+    this.scores.set(id, 0);
+    this.broadcastToAll({ type: 'joined', playerId: id, players: Array.from(this.players.values()).filter(p => !p.disconnected).map(p => p.name) });
+    return { id, sessionToken };
+  }
+
+  /**
+   * Marque un joueur comme deconnecte et demarre un timer de grace de 30s.
+   * Si le joueur ne revient pas, onGraceExpired est appele pour nettoyage externe.
+   */
+  disconnectPlayer(playerId: string, onGraceExpired: () => void): void {
+    const player = this.players.get(playerId);
+    if (!player) return;
+
+    player.ws = null;
+    player.disconnected = true;
+
+    player.graceTimer = setTimeout(() => {
+      this.players.delete(playerId);
+      this.scores.delete(playerId);
+      this.answers.delete(playerId);
+      onGraceExpired();
+    }, 30_000);
+  }
+
+  /**
+   * Reconnecte un joueur existant via son token de session.
+   * Annule le timer de grace, restaure le WebSocket, et retourne le joueur.
+   */
+  reconnectPlayer(sessionToken: string, ws: WebSocket): Player | null {
+    for (const player of this.players.values()) {
+      if (player.sessionToken === sessionToken) {
+        if (player.graceTimer) {
+          clearTimeout(player.graceTimer);
+          player.graceTimer = null;
+        }
+        player.ws = ws;
+        player.disconnected = false;
+        return player;
+      }
+    }
+    return null;
+  }
+
+  /** Met le quiz en pause (host deconnecte pendant une question) */
+  pauseQuiz(): void {
+    if (this.phase !== 'question' || this.paused) return;
+    if (this.timerId) {
+      clearInterval(this.timerId);
+      this.timerId = null;
+    }
+    this.paused = true;
+    this.broadcastToAll({ type: 'paused' });
+  }
+
+  /** Reprend le quiz apres reconnexion du host */
+  resumeQuiz(): void {
+    if (!this.paused) return;
+    this.paused = false;
+    this.broadcastToAll({ type: 'resumed', remaining: this.remaining });
+    this.timerId = setInterval(() => this.tick(), 1000);
   }
 
   /**
@@ -165,8 +232,9 @@ export class QuizRoom {
 
       this.scores.set(playerId, currentScore + score);
     }
-    // Si tout le monde a repondu, terminer la question
-    if (this.answers.size === this.players.size) {
+    // Si tous les joueurs connectes ont repondu, terminer la question
+    const connectedCount = Array.from(this.players.values()).filter(p => !p.disconnected).length;
+    if (connectedCount > 0 && this.answers.size >= connectedCount) {
       this.timeUp();
     }
   }
@@ -210,9 +278,9 @@ export class QuizRoom {
    * Utile pour broadcast.
    */
   private getPlayerWsList(): WebSocket[] {
-    // Extraire les ws de this.players.values()
-    const Sockets = Array.from(this.players.values()).map(player => player.ws);
-    return Sockets;
+    return Array.from(this.players.values())
+      .filter(p => p.ws !== null)
+      .map(p => p.ws!);
   }
 
   /**
@@ -262,8 +330,9 @@ export class QuizRoom {
       scores[player.name] = this.scores.get(playerId) ?? 0;
     } 
     
-    // Envoyer 'results' a tous
-    this.broadcastToAll({type: 'results', correctIndex: currentQuestion.correctIndex,  distribution: distribution, scores: scores});
+    // Sauvegarder pour rejouer a un joueur qui se reconnecte en phase 'results'
+    this.lastResults = { correctIndex: currentQuestion.correctIndex, distribution, scores };
+    this.broadcastToAll({ type: 'results', correctIndex: currentQuestion.correctIndex, distribution, scores });
   }
 
   /**

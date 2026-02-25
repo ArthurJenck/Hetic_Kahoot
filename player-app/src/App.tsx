@@ -21,6 +21,7 @@ function App() {
 
   // --- Etats de l'application ---
   const [phase, setPhase] = useState<QuizPhase | 'join' | 'feedback'>('join')
+  const [paused, setPaused] = useState(false)
   const [playerName, setPlayerName] = useState('')
   const [players, setPlayers] = useState<string[]>([])
   const [currentQuestion, setCurrentQuestion] = useState<Omit<
@@ -39,11 +40,25 @@ function App() {
   )
   const [error, setError] = useState<string | undefined>(undefined)
 
+  // --- Reconnexion automatique avec le token de session ---
+  useEffect(() => {
+    if (status !== 'connected') return
+    const token = sessionStorage.getItem('playerSessionToken')
+    if (token) {
+      sendMessage({ type: 'reconnect', sessionToken: token })
+    }
+  }, [status])
+
   // --- Traitement des messages du serveur ---
   useEffect(() => {
     if (!lastMessage) return
 
     switch (lastMessage.type) {
+      case 'session': {
+        sessionStorage.setItem('playerSessionToken', lastMessage.sessionToken)
+        break
+      }
+
       case 'joined': {
         stopAll()
         play('lobby')
@@ -60,11 +75,23 @@ function App() {
         setCurrentQuestion(lastMessage.question)
         setRemaining(lastMessage.question.timerSec)
         setHasAnswered(false)
+        setPaused(false)
         setPhase('question')
         break
       }
 
       case 'tick': {
+        setRemaining(lastMessage.remaining)
+        break
+      }
+
+      case 'paused': {
+        setPaused(true)
+        break
+      }
+
+      case 'resumed': {
+        setPaused(false)
         setRemaining(lastMessage.remaining)
         break
       }
@@ -86,11 +113,16 @@ function App() {
       }
 
       case 'ended': {
+        sessionStorage.removeItem('playerSessionToken')
         setPhase('ended')
         break
       }
 
       case 'error': {
+        // Si la session est invalide, effacer le token et rester sur join
+        if (lastMessage.message.includes('Session')) {
+          sessionStorage.removeItem('playerSessionToken')
+        }
         setError(lastMessage.message)
         break
       }
@@ -171,7 +203,14 @@ function App() {
               : 'Deconnecte'}
         </span>
       </header>
-      <main className="app-main">{renderPhase()}</main>
+      <main className="app-main">
+        {renderPhase()}
+        {paused && (
+          <div className="pause-overlay">
+            <p>En attente de l'animateur...</p>
+          </div>
+        )}
+      </main>
     </div>
   )
 }

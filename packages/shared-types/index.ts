@@ -19,10 +19,12 @@ export type QuizPhase = 'lobby' | 'question' | 'results' | 'leaderboard' | 'ende
 export type ClientMessage =
   | { type: 'join'; quizCode: string; name: string }
   | { type: 'answer'; questionId: string; choiceIndex: number }
+  | { type: 'reconnect'; sessionToken: string }
   | { type: 'host:create'; title: string; questions: QuizQuestion[] }
   | { type: 'host:start' }
   | { type: 'host:next' }
   | { type: 'host:end' }
+  | { type: 'host:reconnect'; sessionToken: string }
 
 /** Messages envoyes par le serveur vers les clients */
 export type ServerMessage =
@@ -34,3 +36,6 @@ export type ServerMessage =
   | { type: 'ended' }
   | { type: 'error'; message: string }
   | { type: 'sync'; phase: QuizPhase; data: unknown }
+  | { type: 'session'; sessionToken: string }
+  | { type: 'paused' }
+  | { type: 'resumed'; remaining: number }

@@ -21,6 +21,7 @@ function App() {
 
   // --- Etats de l'application ---
   const [phase, setPhase] = useState<QuizPhase | 'create'>('create')
+  const [paused, setPaused] = useState(false)
   const [quizCode, setQuizCode] = useState('')
   const [players, setPlayers] = useState<string[]>([])
   const [currentQuestion, setCurrentQuestion] = useState<Omit<
@@ -37,20 +38,30 @@ function App() {
     [],
   )
 
+  // --- Reconnexion automatique avec le token de session ---
+  useEffect(() => {
+    if (status !== 'connected') return
+    const token = sessionStorage.getItem('hostSessionToken')
+    if (token) {
+      sendMessage({ type: 'host:reconnect', sessionToken: token })
+    }
+  }, [status])
+
   // --- Traitement des messages du serveur ---
   useEffect(() => {
     if (!lastMessage) return
-
-    // TODO: Traiter chaque type de message du serveur
-    // Utiliser un switch sur lastMessage.type
 
     switch (lastMessage.type) {
       case 'sync': {
         if (lastMessage.phase === 'lobby') play('lobby')
 
-        const data = lastMessage.data as { quizCode: string }
+        const data = lastMessage.data as { quizCode: string; sessionToken?: string }
         setQuizCode(data.quizCode)
         setPhase(lastMessage.phase)
+        // Sauvegarder le token de session du host (present au create et au reconnect)
+        if (data.sessionToken) {
+          sessionStorage.setItem('hostSessionToken', data.sessionToken)
+        }
         break
       }
 
@@ -69,11 +80,23 @@ function App() {
         setQuestionTotal(lastMessage.total)
         setRemaining(lastMessage.question.timerSec)
         setAnswerCount(0)
+        setPaused(false)
         setPhase('question')
         break
       }
 
       case 'tick': {
+        setRemaining(lastMessage.remaining)
+        break
+      }
+
+      case 'paused': {
+        setPaused(true)
+        break
+      }
+
+      case 'resumed': {
+        setPaused(false)
         setRemaining(lastMessage.remaining)
         break
       }
@@ -102,7 +125,7 @@ function App() {
 
       case 'ended': {
         play('leaderboard')
-
+        sessionStorage.removeItem('hostSessionToken')
         setPhase('ended')
         break
       }
@@ -194,7 +217,14 @@ function App() {
               : 'Deconnecte'}
         </span>
       </header>
-      <main className="app-main">{renderPhase()}</main>
+      <main className="app-main">
+        {renderPhase()}
+        {paused && (
+          <div className="pause-overlay">
+            <p>Quiz en pause - reconnexion en cours...</p>
+          </div>
+        )}
+      </main>
     </div>
   )
 }
