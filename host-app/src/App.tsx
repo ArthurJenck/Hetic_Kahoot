@@ -89,7 +89,6 @@ function App() {
       }
 
       case 'error': {
-        console.log(lastMessage.message)
         break
       }
     }

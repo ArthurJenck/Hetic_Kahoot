@@ -26,8 +26,6 @@ interface LobbyProps {
  * .player-count, .player-list, .player-chip, .btn-start
  */
 function Lobby({ quizCode, players, onStart }: LobbyProps) {
-  console.log("Lobby - joueurs:", players)
-
   return (
     <div className="phase-container">
       <p className="quiz-code-label">Code du quiz</p>
