@@ -80,7 +80,7 @@ export class QuizRoom {
     // Initialiser le score a 0
     this.scores.set(id, 0); 
     // Envoyer 'joined' a tous les clients
-    this.broadcastToAll({type: 'joined', playerId: id, players: Array.from(this.players.keys())});
+    this.broadcastToAll({type: 'joined', playerId: id, players: Array.from(this.players.values()).map(p => p.name)});
     // Retourner l'ID du joueur
     return id;
   }
