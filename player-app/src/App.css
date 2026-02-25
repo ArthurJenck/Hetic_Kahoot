@@ -209,6 +209,7 @@ body {
   justify-content: center;
   margin: 1.5rem 0;
   padding: 1rem;
+  list-style: none;
 }
 
 .player-chip {

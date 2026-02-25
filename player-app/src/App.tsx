@@ -18,15 +18,20 @@ function App() {
   const { status, sendMessage, lastMessage } = useWebSocket(WS_URL)
 
   // --- Etats de l'application ---
-  const [phase, setPhase] = useState<QuizPhase | 'join' | 'feedback'>('join')
+  const [phase, setPhase] = useState<QuizPhase | 'join' | 'feedback'>('lobby')
   const [playerName, setPlayerName] = useState('')
   const [players, setPlayers] = useState<string[]>([])
-  const [currentQuestion, setCurrentQuestion] = useState<Omit<QuizQuestion, 'correctIndex'> | null>(null)
+  const [currentQuestion, setCurrentQuestion] = useState<Omit<
+    QuizQuestion,
+    'correctIndex'
+  > | null>(null)
   const [remaining, setRemaining] = useState(0)
   const [hasAnswered, setHasAnswered] = useState(false)
   const [lastCorrect, setLastCorrect] = useState(false)
   const [score, setScore] = useState(0)
-  const [rankings, setRankings] = useState<{ name: string; score: number }[]>([])
+  const [rankings, setRankings] = useState<{ name: string; score: number }[]>(
+    [],
+  )
   const [error, setError] = useState<string | undefined>(undefined)
 
   // --- Traitement des messages du serveur ---
@@ -88,8 +93,8 @@ function App() {
 
   /** Appele quand le joueur soumet le formulaire de connexion */
   const handleJoin = (code: string, name: string) => {
-    // TODO: Sauvegarder le nom du joueur dans playerName
-    // TODO: Envoyer un message 'join' au serveur avec sendMessage
+    setPlayerName(name)
+    sendMessage({ type: 'join', quizCode: code, name })
   }
 
   /** Appele quand le joueur clique sur un choix de reponse */
@@ -149,12 +154,14 @@ function App() {
       <header className="app-header">
         <h2>Quiz Player</h2>
         <span className={`status-badge status-${status}`}>
-          {status === 'connected' ? 'Connecte' : status === 'connecting' ? 'Connexion...' : 'Deconnecte'}
+          {status === 'connected'
+            ? 'Connecte'
+            : status === 'connecting'
+              ? 'Connexion...'
+              : 'Deconnecte'}
         </span>
       </header>
-      <main className="app-main">
-        {renderPhase()}
-      </main>
+      <main className="app-main">{renderPhase()}</main>
     </div>
   )
 }
