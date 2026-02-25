@@ -1,0 +1,13 @@
+{
+  "name": "@quiz/monorepo",
+  "private": true,
+  "scripts": {
+    "dev": "pnpm -r --parallel run dev",
+    "dev:apps": "pnpm --filter @quiz/host-app --filter @quiz/player-app --parallel run dev",
+    "dev:host": "pnpm --filter @quiz/host-app run dev",
+    "dev:player": "pnpm --filter @quiz/player-app run dev",
+    "dev:server": "pnpm --filter @quiz/server run dev",
+    "build": "pnpm -r run build",
+    "install:all": "pnpm install"
+  }
+}
