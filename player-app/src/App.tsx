@@ -19,7 +19,7 @@ function App() {
 
   // --- Etats de l'application ---
   const [phase, setPhase] = useState<QuizPhase | 'join' | 'feedback'>(
-    'feedback',
+    'leaderboard',
   )
   const [playerName, setPlayerName] = useState('')
   const [players, setPlayers] = useState<string[]>([])
