@@ -2,6 +2,12 @@
 
 Un quiz interactif en temps reel inspire de Kahoot, construit avec WebSocket, React et TypeScript.
 
+## Collaborateurs
+
+- Arthur JENCK
+- Louis DONDEY
+- Alexis Gontier
+
 ## Prerequis
 
 - **Node.js >= 18**
