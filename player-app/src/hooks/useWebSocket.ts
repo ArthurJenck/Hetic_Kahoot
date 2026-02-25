@@ -91,7 +91,7 @@ export function useWebSocket(url: string): UseWebSocketReturn {
       // Reconnexion avec backoff exponentiel : 1s, 2s, 4s, 8s... max 30s
       const delay = Math.min(
         1000 * Math.pow(2, reconnectAttemptRef.current),
-        MAX_RECONNECT_DELAY
+        MAX_RECONNECT_DELAY,
       )
       console.log(`[useWebSocket] Reconnexion dans ${delay}ms...`)
       reconnectAttemptRef.current += 1
@@ -133,7 +133,9 @@ export function useWebSocket(url: string): UseWebSocketReturn {
     if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
       wsRef.current.send(JSON.stringify(message))
     } else {
-      console.warn('[useWebSocket] Impossible d\'envoyer, WebSocket non connecte')
+      console.warn(
+        "[useWebSocket] Impossible d'envoyer, WebSocket non connecte",
+      )
     }
   }, [])
 

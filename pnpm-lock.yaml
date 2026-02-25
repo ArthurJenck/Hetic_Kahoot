@@ -10,6 +10,9 @@ importers:
 
   host-app:
     dependencies:
+      howler:
+        specifier: ^2.2.4
+        version: 2.2.4
       react:
         specifier: ^18.2.0
         version: 18.3.1
@@ -17,6 +20,9 @@ importers:
         specifier: ^18.2.0
         version: 18.3.1(react@18.3.1)
     devDependencies:
+      '@types/howler':
+        specifier: ^2.2.11
+        version: 2.2.12
       '@types/react':
         specifier: ^18.2.48
         version: 18.3.28
@@ -33,10 +39,18 @@ importers:
         specifier: ^5.0.12
         version: 5.4.21(@types/node@20.19.33)
 
+  packages/shared-sounds: {}
+
   packages/shared-types: {}
 
   player-app:
     dependencies:
+      '@sglara/cn':
+        specifier: ^1.0.0
+        version: 1.0.0
+      howler:
+        specifier: ^2.2.4
+        version: 2.2.4
       react:
         specifier: ^18.2.0
         version: 18.3.1
@@ -44,6 +58,9 @@ importers:
         specifier: ^18.2.0
         version: 18.3.1(react@18.3.1)
     devDependencies:
+      '@types/howler':
+        specifier: ^2.2.11
+        version: 2.2.12
       '@types/react':
         specifier: ^18.2.48
         version: 18.3.28
@@ -466,6 +483,9 @@ packages:
     cpu: [x64]
     os: [win32]
 
+  '@sglara/cn@1.0.0':
+    resolution: {integrity: sha512-uo5RMzXVhS2XdsPYajVH349/eBxhLEoJOmScUuX0V5kesB8DueofOh64kgVR4v3/uZWJBpMYy5Eh9aIG+qG34Q==}
+
   '@tsconfig/node10@1.0.12':
     resolution: {integrity: sha512-UCYBaeFvM11aU2y3YPZ//O5Rhj+xKyzy7mvcIoAjASbigy8mHMryP5cK7dgjlz2hWxh1g5pLw084E0a/wlUSFQ==}
 
@@ -492,6 +512,9 @@ packages:
 
   '@types/estree@1.0.8':
     resolution: {integrity: sha512-dWHzHa2WqEXI/O1E9OjrocMTKJl2mSrEolh1Iomrv6U+JuNwaHXsXx9bLu5gG7BUWFIN0skIQJQ/L1rIex4X6w==}
+
+  '@types/howler@2.2.12':
+    resolution: {integrity: sha512-hy769UICzOSdK0Kn1FBk4gN+lswcj1EKRkmiDtMkUGvFfYJzgaDXmVXkSShS2m89ERAatGIPnTUlp2HhfkVo5g==}
 
   '@types/node@20.19.33':
     resolution: {integrity: sha512-Rs1bVAIdBs5gbTIKza/tgpMuG1k3U/UMJLWecIMxNdJFDMzcM5LOiLVRYh3PilWEYDIeUDv7bpiHPLPsbydGcw==}
@@ -541,6 +564,10 @@ packages:
   caniuse-lite@1.0.30001774:
     resolution: {integrity: sha512-DDdwPGz99nmIEv216hKSgLD+D4ikHQHjBC/seF98N9CPqRX4M5mSxT9eTV6oyisnJcuzxtZy4n17yKKQYmYQOA==}
 
+  clsx@1.2.1:
+    resolution: {integrity: sha512-EcR6r5a8bj6pu3ycsa/E/cKVGuTgZJZdsyUYHOksG/UHIiKfjxzRxYJpyVBwYaQeOvghal9fcc4PidlgzugAQg==}
+    engines: {node: '>=6'}
+
   convert-source-map@2.0.0:
     resolution: {integrity: sha512-Kvp459HrV2FEJ1CAsi1Ku+MY3kasH19TFykTz2xWmMeq6bk2NU3XXvfJ+Q61m0xktWwt+1HSYf3JZsTms3aRJg==}
 
@@ -583,6 +610,9 @@ packages:
   gensync@1.0.0-beta.2:
     resolution: {integrity: sha512-3hN7NaskYvMDLQY55gnW3NQ+mesEAepTqlg+VEbj7zzqEMBVNhzcGYYeqFo/TlYz6eQiFcp1HcsCZO+nGgS8zg==}
     engines: {node: '>=6.9.0'}
+
+  howler@2.2.4:
+    resolution: {integrity: sha512-iARIBPgcQrwtEr+tALF+rapJ8qSc+Set2GJQl7xT1MQzWaVkFebdJhR3alVlSiUf5U7nAANKuj3aWpwerocD5w==}
 
   js-tokens@4.0.0:
     resolution: {integrity: sha512-RdJUflcE3cUzKiMqQgsCu06FPu9UdIJO0beYbPhHN4k6apgJtifcoCtT9bcxOpYBtpD2kCM6Sbzg4CausW/PKQ==}
@@ -653,6 +683,9 @@ packages:
   source-map-js@1.2.1:
     resolution: {integrity: sha512-UXWMKhLOwVKb728IUtQPXxfYU+usdybtUrK/8uGE8CQMvrhOpwvzDBwj0QhSL7MQc7vIsISBG8VQ8+IDQxpfQA==}
     engines: {node: '>=0.10.0'}
+
+  tailwind-merge@1.14.0:
+    resolution: {integrity: sha512-3mFKyCo/MBcgyOTlrY8T7odzZFx+w+qKSMAmdFzRvqBfLlSigU6TZnlFHK0lkMwj9Bj8OYU+9yW9lmGuS0QEnQ==}
 
   ts-node@10.9.2:
     resolution: {integrity: sha512-f0FFpIdcHgn8zcPSbf1dRevwt047YMnaiJM3u2w2RewrB+fob/zePZcrOyQoLMMO7aBIddLcQIEK5dYjkLnGrQ==}
@@ -1023,6 +1056,11 @@ snapshots:
   '@rollup/rollup-win32-x64-msvc@4.59.0':
     optional: true
 
+  '@sglara/cn@1.0.0':
+    dependencies:
+      clsx: 1.2.1
+      tailwind-merge: 1.14.0
+
   '@tsconfig/node10@1.0.12': {}
 
   '@tsconfig/node12@1.0.11': {}
@@ -1053,6 +1091,8 @@ snapshots:
       '@babel/types': 7.29.0
 
   '@types/estree@1.0.8': {}
+
+  '@types/howler@2.2.12': {}
 
   '@types/node@20.19.33':
     dependencies:
@@ -1105,6 +1145,8 @@ snapshots:
 
   caniuse-lite@1.0.30001774: {}
 
+  clsx@1.2.1: {}
+
   convert-source-map@2.0.0: {}
 
   create-require@1.1.1: {}
@@ -1151,6 +1193,8 @@ snapshots:
     optional: true
 
   gensync@1.0.0-beta.2: {}
+
+  howler@2.2.4: {}
 
   js-tokens@4.0.0: {}
 
@@ -1232,6 +1276,8 @@ snapshots:
   semver@6.3.1: {}
 
   source-map-js@1.2.1: {}
+
+  tailwind-merge@1.14.0: {}
 
   ts-node@10.9.2(@types/node@20.19.33)(typescript@5.9.3):
     dependencies:

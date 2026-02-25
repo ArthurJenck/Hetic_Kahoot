@@ -5,6 +5,7 @@
 
 import { useState, useEffect } from 'react'
 import { useWebSocket } from './hooks/useWebSocket'
+import { useHostSounds } from './hooks/useHostSounds'
 import type { QuizPhase, QuizQuestion, ServerMessage } from '@shared/index'
 import CreateQuiz from './components/CreateQuiz'
 import Lobby from './components/Lobby'
@@ -12,23 +13,29 @@ import QuestionView from './components/QuestionView'
 import Results from './components/Results'
 import Leaderboard from './components/Leaderboard'
 
-const WS_URL = 'ws://localhost:3001'
+const WS_URL = `ws://${window.location.hostname}:3001`
 
 function App() {
   const { status, sendMessage, lastMessage } = useWebSocket(WS_URL)
+  const { play, stop, stopAll, playCountdown } = useHostSounds()
 
   // --- Etats de l'application ---
   const [phase, setPhase] = useState<QuizPhase | 'create'>('create')
   const [quizCode, setQuizCode] = useState('')
   const [players, setPlayers] = useState<string[]>([])
-  const [currentQuestion, setCurrentQuestion] = useState<Omit<QuizQuestion, 'correctIndex'> | null>(null)
+  const [currentQuestion, setCurrentQuestion] = useState<Omit<
+    QuizQuestion,
+    'correctIndex'
+  > | null>(null)
   const [questionIndex, setQuestionIndex] = useState(0)
   const [questionTotal, setQuestionTotal] = useState(0)
   const [remaining, setRemaining] = useState(0)
   const [answerCount, setAnswerCount] = useState(0)
   const [correctIndex, setCorrectIndex] = useState(-1)
   const [distribution, setDistribution] = useState<number[]>([])
-  const [rankings, setRankings] = useState<{ name: string; score: number }[]>([])
+  const [rankings, setRankings] = useState<{ name: string; score: number }[]>(
+    [],
+  )
 
   // --- Traitement des messages du serveur ---
   useEffect(() => {
@@ -39,6 +46,8 @@ function App() {
 
     switch (lastMessage.type) {
       case 'sync': {
+        if (lastMessage.phase === 'lobby') play('lobby')
+
         const data = lastMessage.data as { quizCode: string }
         setQuizCode(data.quizCode)
         setPhase(lastMessage.phase)
@@ -51,6 +60,10 @@ function App() {
       }
 
       case 'question': {
+        stopAll()
+        play('getReady')
+        playCountdown(lastMessage.question.timerSec)
+
         setCurrentQuestion(lastMessage.question)
         setQuestionIndex(lastMessage.index)
         setQuestionTotal(lastMessage.total)
@@ -66,6 +79,8 @@ function App() {
       }
 
       case 'results': {
+        stopAll()
+
         setCorrectIndex(lastMessage.correctIndex)
         setDistribution(lastMessage.distribution)
         let total = 0
@@ -78,17 +93,22 @@ function App() {
       }
 
       case 'leaderboard': {
+        play('leaderboard')
+
         setRankings(lastMessage.rankings)
         setPhase('leaderboard')
         break
       }
 
       case 'ended': {
+        play('leaderboard')
+
         setPhase('ended')
         break
       }
 
       case 'error': {
+        console.error(lastMessage.message)
         break
       }
     }
@@ -119,11 +139,7 @@ function App() {
 
       case 'lobby':
         return (
-          <Lobby
-            quizCode={quizCode}
-            players={players}
-            onStart={handleStart}
-          />
+          <Lobby quizCode={quizCode} players={players} onStart={handleStart} />
         )
 
       case 'question':
@@ -171,12 +187,14 @@ function App() {
       <header className="app-header">
         <h2>Quiz Host</h2>
         <span className={`status-badge status-${status}`}>
-          {status === 'connected' ? 'Connecte' : status === 'connecting' ? 'Connexion...' : 'Deconnecte'}
+          {status === 'connected'
+            ? 'Connecte'
+            : status === 'connecting'
+              ? 'Connexion...'
+              : 'Deconnecte'}
         </span>
       </header>
-      <main className="app-main">
-        {renderPhase()}
-      </main>
+      <main className="app-main">{renderPhase()}</main>
     </div>
   )
 }
