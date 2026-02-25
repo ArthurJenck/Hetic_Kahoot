@@ -27,8 +27,8 @@ interface JoinScreenProps {
  * .error-message, .btn-primary
  */
 function JoinScreen({ onJoin, error }: JoinScreenProps) {
-  // TODO: State pour le code du quiz
-  // TODO: State pour le pseudo
+  const [quizCode, setQuizCode] = useState<number | undefined>(undefined)
+  const [nick, setNick] = useState<string | undefined>(undefined)
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()

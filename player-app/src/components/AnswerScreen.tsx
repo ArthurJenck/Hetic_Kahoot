@@ -33,7 +33,12 @@ interface AnswerScreenProps {
  * Classes CSS disponibles : .answer-screen, .answer-timer, .warning, .danger,
  * .answer-question, .answer-grid, .answer-btn, .selected, .answered-message
  */
-function AnswerScreen({ question, remaining, onAnswer, hasAnswered }: AnswerScreenProps) {
+function AnswerScreen({
+  question,
+  remaining,
+  onAnswer,
+  hasAnswered,
+}: AnswerScreenProps) {
   // TODO: State optionnel pour stocker l'index du choix selectionne
 
   const handleClick = (index: number) => {
